@@ -6,7 +6,7 @@
     <title>qr-icon</title>
   </head>
   <body>
-    <h2>なぜか読み取れる QR コード</h2>
+    <h2>変な QR コードを作るツール</h2>
     <p>
       <label for="text">埋め込むテキスト</label>
       <input id="text" type="text" value="" />
@@ -19,17 +19,18 @@
       <summary>オプション</summary>
       <p>
         <label for="moduleSize">スケール</label>
-        <input id="moduleSize" type="range" min="1" max="20" step="1" value="8" />
+        <input id="moduleSize" type="range" min="2" max="16" step="1" value="8" />
       </p>
       <p>
         <label for="dotSize">モジュールサイズ</label>
-        <input id="dotSize" type="range" min="1" max="20" step="1" value="2" />
+        <input id="dotSize" type="range" min="2" max="16" step="1" value="2" />
       </p>
       <p>
         <label for="sn">S/N</label>
         <input id="sn" type="range" min="0.00" max="0.5" step="0.01" value="0.02" />
       </p>
     </details>
+    <p>※ ちゃんと読み取れる保証はないので、大事なシーンでは使わないで下さい。</p>
     <hr />
     <canvas id="render" />
     <script type="module" src="./main.js"></script>
