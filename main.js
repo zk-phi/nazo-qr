@@ -58,14 +58,7 @@ export const dither = (arr, width, height) => {
   }
 };
 
-/* ---- */
-
-const img = new Image();
-const textEl = document.getElementById("text");
-const moduleSizeEl = document.getElementById("moduleSize");
-const dotSizeEl = document.getElementById("dotSize");
-const snEl = document.getElementById("sn");
-
+/* Dither, binarize img and add noise. */
 const makeFilteredImage = (img, width, height, sn) => {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -95,6 +88,14 @@ const makeFilteredImage = (img, width, height, sn) => {
   return canvas;
 };
 
+/* ---- */
+
+const img = new Image();
+const textEl = document.getElementById("text");
+const moduleSizeEl = document.getElementById("moduleSize");
+const dotSizeEl = document.getElementById("dotSize");
+const snEl = document.getElementById("sn");
+
 const gen = () => {
   const text = textEl.value;
   const moduleSize = Number(moduleSizeEl.value);
@@ -112,12 +113,12 @@ const gen = () => {
   canvas.height = size * moduleSize;
 
   const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
 
   /* render background */
   const bgSize = (size - 2) * moduleSize;
   const smallBgSize = Math.floor(bgSize / dotSize);
   const bg = makeFilteredImage(img, smallBgSize, smallBgSize, sn);
-  ctx.imageSmoothingEnabled = false;
   ctx.drawImage(bg, 0, 0, smallBgSize, smallBgSize, moduleSize, moduleSize, bgSize, bgSize);
 
   /* render QR */
