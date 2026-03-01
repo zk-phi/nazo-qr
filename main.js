@@ -66,6 +66,35 @@ const moduleSizeEl = document.getElementById("moduleSize");
 const dotSizeEl = document.getElementById("dotSize");
 const snEl = document.getElementById("sn");
 
+const makeFilteredImage = (img, width, height, sn) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, width, height);
+
+  const data = ctx.getImageData(0, 0, width, height);
+  dither(data.data, width, height);
+
+  /* add noise */
+  const numNoise = width * height * sn;
+  for (let i = 0; i < numNoise; i++) {
+    const x = Math.floor(Math.random() * width);
+    const y = Math.floor(Math.random() * height);
+    const ix = (y * width + x) * 4;
+    const val = data.data[ix + 0];
+    data.data[ix + 0] = val ? 0 : 255;
+    data.data[ix + 1] = val ? 0 : 255;
+    data.data[ix + 2] = val ? 0 : 255;
+  }
+
+  ctx.putImageData(data, 0, 0);
+  return canvas;
+};
+
 const gen = () => {
   const text = textEl.value;
   const moduleSize = Number(moduleSizeEl.value);
@@ -83,32 +112,13 @@ const gen = () => {
   canvas.height = size * moduleSize;
 
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   /* render background */
-  ctx.drawImage(
-    img,
-    0, 0, img.naturalWidth, img.naturalHeight,
-    moduleSize, moduleSize, canvas.width - moduleSize * 2, canvas.height - moduleSize * 2,
-  );
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  dither(imageData.data, canvas.width, canvas.height);
-  const numNoise = (canvas.width / dotSize) * (canvas.height / dotSize) * sn;
-  for (let i = 0; i < numNoise; i++) {
-    const x = Math.floor(Math.random() * canvas.width);
-    const y = Math.floor(Math.random() * canvas.height);
-    for (let dx = 0; dx < dotSize; dx++) {
-      for (let dy = 0; dy < dotSize; dy++) {
-        const ix = ((y + dy) * canvas.width + (x + dx)) * 4;
-        const val = imageData.data[ix + 0];
-        imageData.data[ix + 0] = val ? 0 : 255;
-        imageData.data[ix + 1] = val ? 0 : 255;
-        imageData.data[ix + 2] = val ? 0 : 255;
-      }
-    }
-  }
-  ctx.putImageData(imageData, 0, 0);
+  const bgSize = (size - 2) * moduleSize;
+  const smallBgSize = Math.floor(bgSize / dotSize);
+  const bg = makeFilteredImage(img, smallBgSize, smallBgSize, sn);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(bg, 0, 0, smallBgSize, smallBgSize, moduleSize, moduleSize, bgSize, bgSize);
 
   /* render QR */
   for (let x = 0; x < size; x++) {
