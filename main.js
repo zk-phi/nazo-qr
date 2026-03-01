@@ -1,13 +1,5 @@
 import { encode } from "uqr";
 
-const MODULE_SIZE = 6;
-const DOT_SIZE = 2;
-const DOT_POS = (MODULE_SIZE - DOT_SIZE) / 2;
-
-const SN = 0.05;
-
-/* ---- */
-
 const DITHER_THRESHOLD = 128;
 
 /* Floyd-steinberg dithering */
@@ -69,17 +61,26 @@ export const dither = (arr, width, height) => {
 /* ---- */
 
 const img = new Image();
-const text = document.getElementById("text");
+const textEl = document.getElementById("text");
+const moduleSizeEl = document.getElementById("moduleSize");
+const dotSizeEl = document.getElementById("dotSize");
+const snEl = document.getElementById("sn");
 
 const gen = () => {
-  const { data, size } = encode(text.value, {
+  const text = textEl.value;
+  const moduleSize = Number(moduleSizeEl.value);
+  const dotSize = Math.min(Number(dotSizeEl.value), moduleSize);
+  const dotPos = Math.floor((moduleSize - dotSize) / 2);
+  const sn = Number(snEl.value);
+
+  const { data, size } = encode(text, {
     ecc: "H",
     border: 1,
   });
 
   const canvas = document.getElementById("render");
-  canvas.width = size * MODULE_SIZE;
-  canvas.height = size * MODULE_SIZE;
+  canvas.width = size * moduleSize;
+  canvas.height = size * moduleSize;
 
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#fff";
@@ -89,15 +90,17 @@ const gen = () => {
   ctx.drawImage(
     img,
     0, 0, img.naturalWidth, img.naturalHeight,
-    0, 0, canvas.width, canvas.height,
+    moduleSize, moduleSize, canvas.width - moduleSize * 2, canvas.height - moduleSize * 2,
   );
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   dither(imageData.data, canvas.width, canvas.height);
-  /* add noise */
-  for (let x = 0; x < canvas.width; x++) {
-    for (let y = 0; y < canvas.height; y++) {
-      if (Math.random() < SN) {
-        const ix = (y * canvas.width + x) * 4;
+  const numNoise = (canvas.width / dotSize) * (canvas.height / dotSize) * sn;
+  for (let i = 0; i < numNoise; i++) {
+    const x = Math.floor(Math.random() * canvas.width);
+    const y = Math.floor(Math.random() * canvas.height);
+    for (let dx = 0; dx < dotSize; dx++) {
+      for (let dy = 0; dy < dotSize; dy++) {
+        const ix = ((y + dy) * canvas.width + (x + dx)) * 4;
         const val = imageData.data[ix + 0];
         imageData.data[ix + 0] = val ? 0 : 255;
         imageData.data[ix + 1] = val ? 0 : 255;
@@ -115,10 +118,10 @@ const gen = () => {
       const dotted = !isFinder && !isBorder;
       ctx.fillStyle = data[y][x] ? "#000" : "#fff";
       ctx.fillRect(
-        x * MODULE_SIZE + (dotted ? DOT_POS : 0),
-        y * MODULE_SIZE + (dotted ? DOT_POS : 0),
-        dotted ? DOT_SIZE : MODULE_SIZE,
-        dotted ? DOT_SIZE : MODULE_SIZE,
+        x * moduleSize + (dotted ? dotPos : 0),
+        y * moduleSize + (dotted ? dotPos : 0),
+        dotted ? dotSize : moduleSize,
+        dotted ? dotSize : moduleSize,
       );
     }
   }
@@ -127,7 +130,10 @@ const gen = () => {
 /* ---- */
 
 img.addEventListener("load", gen);
-text.addEventListener("input", gen);
+textEl.addEventListener("input", gen);
+moduleSizeEl.addEventListener("input", gen);
+dotSizeEl.addEventListener("input", gen);
+snEl.addEventListener("input", gen);
 
 document.getElementById("img").addEventListener("change", (e) => {
   const file = e.target.files[0];
