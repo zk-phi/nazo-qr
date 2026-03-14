@@ -1,41 +1,67 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>qr-icon</title>
-    <script type="module" crossorigin src="/nazo-qr/assets/index-DdJ0I66K.js"></script>
+    <title>ドット絵 QR ジェネレーター</title>
+    <script type="module" crossorigin src="/nazo-qr/assets/index-CbH6Z90z.js"></script>
+    <link rel="stylesheet" crossorigin href="/nazo-qr/assets/index-CRYK6WoY.css">
   </head>
   <body>
-    <h2>ドット絵に擬態した QR コードを作るツール</h2>
-    <p>
-      ギリギリ読み取れる不思議な QR コードを作ります。
-    </p>
-    <p>
-      <label for="text">埋め込むテキスト</label>
-      <input id="text" type="text" value="" />
-    </p>
-    <p>
-      <label for="img">画像を選択</label>
-      <input id="img" type="file" />
-    </p>
-    <details>
-      <summary>オプション</summary>
-      <p>
-        <label for="moduleSize">スケール</label>
-        <input id="moduleSize" type="range" min="1" max="16" step="1" value="11" />
-      </p>
-      <p>
-        <label for="dotSize">モジュールサイズ</label>
-        <input id="dotSize" type="range" min="1" max="16" step="1" value="3" />
-      </p>
-      <p>
-        <label for="sn">S/N</label>
-        <input id="sn" type="range" min="0.00" max="0.5" step="0.01" value="0.01" />
-      </p>
-    </details>
-    <p>※ ちゃんと読み取れる保証はないので、大事なシーンでは使わないで下さい。</p>
-    <hr />
-    <canvas id="render" />
+    <div class="container">
+      <header>
+        <h1>ドット絵 QR ジェネレーター</h1>
+        <p class="subtitle">ドット絵に擬態した QR コードを作るツール</p>
+      </header>
+
+      <main>
+        <div class="card controls">
+          <div class="input-group">
+            <label for="text">埋め込むテキスト</label>
+            <input id="text" type="text" value="https://example.com" placeholder="URLやメッセージを入力..." />
+          </div>
+
+          <div class="input-group">
+            <label for="img">画像を選択</label>
+            <input id="img" type="file" accept="image/*" />
+          </div>
+
+          <details open>
+            <summary>詳細設定</summary>
+            <div class="options-content">
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="moduleSize">スケール (全体サイズ)</label>
+                  <span id="val-moduleSize">11</span>
+                </div>
+                <input id="moduleSize" type="range" min="1" max="16" step="1" value="11" />
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="dotSize">ドットサイズ</label>
+                  <span id="val-dotSize">3</span>
+                </div>
+                <input id="dotSize" type="range" min="1" max="16" step="1" value="3" />
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="sn">ノイズ強度 (S/N)</label>
+                  <span id="val-sn">0.01</span>
+                </div>
+                <input id="sn" type="range" min="0.00" max="0.5" step="0.01" value="0.01" />
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="card preview">
+          <canvas id="render"></canvas>
+        </div>
+      </main>
+
+      <p class="disclaimer">※ 読み取り精度は保証されません。大事な用途には通常のQRコードをご利用ください。</p>
+    </div>
   </body>
 </html>
