@@ -1,4 +1,5 @@
 import { encode } from "uqr";
+import "./style.css";
 
 const DITHER_THRESHOLD = 128;
 
@@ -96,7 +97,17 @@ const moduleSizeEl = document.getElementById("moduleSize");
 const dotSizeEl = document.getElementById("dotSize");
 const snEl = document.getElementById("sn");
 
+const moduleSizeLabel = document.getElementById("val-moduleSize");
+const dotSizeLabel = document.getElementById("val-dotSize");
+const snLabel = document.getElementById("val-sn");
+
 const gen = () => {
+  /* update labels */
+  moduleSizeLabel.textContent = moduleSizeEl.value;
+  dotSizeLabel.textContent = dotSizeEl.value;
+  snLabel.textContent = snEl.value;
+
+  /* normalize values */
   const text = textEl.value;
   const moduleSize = Number(moduleSizeEl.value);
   const dotSize = Math.min(Number(dotSizeEl.value), moduleSize);
@@ -153,3 +164,5 @@ document.getElementById("img").addEventListener("change", (e) => {
   reader.onload = (e) => img.src = e.target.result;
   reader.readAsDataURL(file);
 });
+
+gen();
